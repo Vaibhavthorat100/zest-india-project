@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: student_sqlserver
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=ZestIndiaPass@2026!
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqldata:/var/opt/mssql/data
+
+  webapi:
+    build:
+      context: ./StudentManagementAPI
+      dockerfile: Dockerfile
+    container_name: student_webapi
+    ports:
+      - "5000:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=ZestStudentDb;User Id=sa;Password=ZestIndiaPass@2026!;TrustServerCertificate=True;
+    depends_on:
+      - sqlserver
+
+volumes:
+  sqldata:
